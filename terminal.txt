@@ -1,0 +1,58 @@
+*******************************************************************************
+https://get.docker.com/
+
+ 2018-01-30 14:20:51 ⌚  noel-pc in ~/Documentos/platzi/docker
+○ → curl -fsSL get.docker.com -o get-docker.sh
+
+ 2018-01-30 14:20:51 ⌚  noel-pc in ~/Documentos/platzi/docker
+○ → curl -fsSL get.docker.com -o get-docker.sh
+
+ 2018-01-30 14:21:01 ⌚  noel-pc in ~/Documentos/platzi/docker
+○ → sh get-docker.sh
+# Executing docker install script, commit: 1d31602
++ sudo -E sh -c apt-get update -qq >/dev/null
+[sudo] password for noel: 
++ sudo -E sh -c apt-get install -y -qq apt-transport-https ca-certificates curl >/dev/null
++ sudo -E sh -c curl -fsSL "https://download.docker.com/linux/ubuntu/gpg" | apt-key add -qq - >/dev/null
+Warning: apt-key output should not be parsed (stdout is not a terminal)
++ sudo -E sh -c echo "deb [arch=amd64] https://download.docker.com/linux/ubuntu artful edge" > /etc/apt/sources.list.d/docker.list
++ [ ubuntu = debian ]
++ sudo -E sh -c apt-get update -qq >/dev/null
++ sudo -E sh -c apt-get install -y -qq --no-install-recommends docker-ce >/dev/null
+
+ 2018-01-30 14:24:41 ⌚  noel-pc in ~/Documentos/platzi/docker
+○ → sudo usermod -aG docker noel
+
+ 2018-01-30 14:26:22 ⌚  noel-pc in ~/Documentos/platzi/docker
+○ → docker
+
+ 2018-01-30 14:44:51 ⌚  noel-pc in ~
+○ → su - noel
+Contraseña: 
+noel@noel-pc:~$ docker info
+noel@noel-pc:~$ docker version
+Client:
+ Version:	18.01.0-ce
+ API version:	1.35
+ Go version:	go1.9.2
+ Git commit:	03596f5
+ Built:	Wed Jan 10 20:13:21 2018
+ OS/Arch:	linux/amd64
+ Experimental:	false
+ Orchestrator:	swarm
+
+Server:
+ Engine:
+  Version:	18.01.0-ce
+  API version:	1.35 (minimum version 1.12)
+  Go version:	go1.9.2
+  Git commit:	03596f5
+  Built:	Wed Jan 10 20:11:47 2018
+  OS/Arch:	linux/amd64
+  Experimental:	false
+noel@noel-pc:~/Documentos/platzi/docker$ docker run hello-world
+
+
+
+
+
