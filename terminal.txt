@@ -52,6 +52,189 @@ Server:
   Experimental:	false
 noel@noel-pc:~/Documentos/platzi/docker$ docker run hello-world
 
+***************************************************************************************************************************
+noel@noel-pc:~/Documentos/platzi/docker$ docker images
+REPOSITORY          TAG                 IMAGE ID            CREATED             SIZE
+hello-world         latest              f2a91732366c        2 months ago        1.85kB
+noel@noel-pc:~/Documentos/platzi/docker$ docker pull ubuntu
+noel@noel-pc:~/Documentos/platzi/docker$ docker images
+REPOSITORY          TAG                 IMAGE ID            CREATED             SIZE
+ubuntu              latest              0458a4468cbc        5 days ago          112MB
+hello-world         latest              f2a91732366c        2 months ago        1.85kB
+noel@noel-pc:~/Documentos/platzi/docker$ docker pull ubuntu:16.04
+16.04: Pulling from library/ubuntu
+Digest: sha256:e27e9d7f7f28d67aa9e2d7540bdc2b33254b452ee8e60f388875e5b7d9b2b696
+Status: Downloaded newer image for ubuntu:16.04
+noel@noel-pc:~/Documentos/platzi/docker$ docker run ubuntu echo "Hola Platzi"
+Hola Platzi
+noel@noel-pc:~/Documentos/platzi/docker$ docker ps -a
+CONTAINER ID        IMAGE               COMMAND                CREATED             STATUS                      PORTS               NAMES
+93cc5661df21        ubuntu              "echo 'Hola Platzi'"   16 seconds ago      Exited (0) 14 seconds ago                       upbeat_goodall
+51fe35f738e6        hello-world         "/hello"               31 minutes ago      Exited (0) 31 minutes ago                       elegant_swirles
+5a37af86d1ae        hello-world         "/hello"               33 minutes ago      Exited (0) 33 minutes ago                       naughty_benz
+noel@noel-pc:~/Documentos/platzi/docker$ docker run ubuntu ps -efa
+UID        PID  PPID  C STIME TTY          TIME CMD
+root         1     0  2 19:25 ?        00:00:00 ps -efa
+noel@noel-pc:~/Documentos/platzi/docker$ docker ps -a
+CONTAINER ID        IMAGE               COMMAND                CREATED              STATUS                          PORTS               NAMES
+05f315674b99        ubuntu              "ps -efa"              59 seconds ago       Exited (0) 58 seconds ago                           adoring_aryabhata
+f2393671647d        ubuntu              "ps -a"                About a minute ago   Exited (1) About a minute ago                       dazzling_shirley
+93cc5661df21        ubuntu              "echo 'Hola Platzi'"   3 minutes ago        Exited (0) 3 minutes ago                            upbeat_goodall
+51fe35f738e6        hello-world         "/hello"               35 minutes ago       Exited (0) 35 minutes ago                           elegant_swirles
+5a37af86d1ae        hello-world         "/hello"               36 minutes ago       Exited (0) 36 minutes ago                           naughty_benz
+noel@noel-pc:~/Documentos/platzi/docker$ 
+noel@noel-pc:~/Documentos/platzi/docker$ docker run -it ubuntu bash
+root@06c6c34864f4:/# ls
+bin  boot  dev  etc  home  lib  lib64  media  mnt  opt  proc  root  run  sbin  srv  sys  tmp  usr  var
+root@06c6c34864f4:/# touch platzidocker
+root@06c6c34864f4:/# ls
+bin  boot  dev  etc  home  lib  lib64  media  mnt  opt  platzidocker  proc  root  run  sbin  srv  sys  tmp  usr  var
+root@06c6c34864f4:/# ps -fea
+UID        PID  PPID  C STIME TTY          TIME CMD
+root         1     0  0 19:28 pts/0    00:00:00 bash
+root        14     1  0 19:29 pts/0    00:00:00 ps -fea
+root@06c6c34864f4:/# exit
+exit
+noel@noel-pc:~/Documentos/platzi/docker$ docker run -it ubuntu bash
+root@1e5d1c08f161:/# CTRL + PQ
+bash: CTRL: command not found
+root@1e5d1c08f161:/# noel@noel-pc:~/Documentos/platzi/docker$ docker ps
+CONTAINER ID        IMAGE               COMMAND             CREATED              STATUS              PORTS               NAMES
+1e5d1c08f161        ubuntu              "bash"              About a minute ago   Up About a minute                       eager_dijkstra
+noel@noel-pc:~/Documentos/platzi/docker$ docker attach 1e5d1c08f161
+root@1e5d1c08f161:/# 
+noel@noel-pc:~/Documentos/platzi/docker$ docker ps -a --no-trunc
+CONTAINER ID                                                       IMAGE               COMMAND                CREATED             STATUS                         PORTS               NAMES
+1e5d1c08f16156387d598eae528f83bf2314f962736e7cea7bdaed5709b3e854   ubuntu              "bash"                 5 minutes ago       Up 5 minutes                                       eager_dijkstra
+91d8ed4ab8f8e5782f67745ad22f4ee39061ba16cc855e18ead46d8363194736   ubuntu              "bash"                 6 minutes ago       Exited (0) 6 minutes ago                           elated_heyrovsky
+06c6c34864f472fb613fe4d895b54a4d4ed30dd1c9359cfa334f36bb008645c4   ubuntu              "bash"                 9 minutes ago       Exited (0) 7 minutes ago                           stupefied_bell
+05f315674b99e7b594386fb8f48cc4ec731c6395da6da1ad666b4fa786afb331   ubuntu              "ps -efa"              13 minutes ago      Exited (0) 13 minutes ago                          adoring_aryabhata
+f2393671647d8167c2adeed2352dbb4290b3019186a096a8bc427148f59b93d3   ubuntu              "ps -a"                13 minutes ago      Exited (1) 13 minutes ago                          dazzling_shirley
+93cc5661df218f5d592b1e3726c24a738dd27f30535b87da6a1e54eb21a3bb87   ubuntu              "echo 'Hola Platzi'"   15 minutes ago      Exited (0) 15 minutes ago                          upbeat_goodall
+51fe35f738e6a38ae70366c2a14b26dd30f9d6ba195ea14f27a1b8ddd94e274d   hello-world         "/hello"               About an hour ago   Exited (0) About an hour ago                       elegant_swirles
+5a37af86d1ae558bb8a85958e3ec56236448e1fbaeb01feffb9dbf448955abdc   hello-world         "/hello"               About an hour ago   Exited (0) About an hour ago                       naughty_benz
+noel@noel-pc:~/Documentos/platzi/docker$
+noel@noel-pc:~/Documentos/platzi/docker$ docker run --name noel ubuntu ls -l
+noel@noel-pc:~/Documentos/platzi/docker$ docker ps -a
+CONTAINER ID        IMAGE               COMMAND                CREATED             STATUS                         PORTS               NAMES
+1d8eac4c2a4c        ubuntu              "ls -l"                48 seconds ago      Exited (0) 46 seconds ago                          noel
+noel@noel-pc:~/Documentos/platzi/docker$ docker start noel
+noel
+noel@noel-pc:~/Documentos/platzi/docker$ docker kill noel
+Error response from daemon: Cannot kill container: noel: Container 1d8eac4c2a4cc14a2c33ebbc6079510ca5628c12141a8abcddc43cd7301d97a6 is not running
+noel@noel-pc:~/Documentos/platzi/docker$ docker run --name noel ubuntu ls -l
+docker: Error response from daemon: Conflict. The container name "/noel" is already in use by container "1d8eac4c2a4cc14a2c33ebbc6079510ca5628c12141a8abcddc43cd7301d97a6". You have to remove (or rename) that container to be able to reuse that name.
+See 'docker run --help'.
+noel@noel-pc:~/Documentos/platzi/docker$ docker rm noel
+noel
+noel@noel-pc:~/Documentos/platzi/docker$ docker run --name noel ubuntu ls -l
+noel@noel-pc:~/Documentos/platzi/docker$ docker ps --filter="exited=0"
+CONTAINER ID        IMAGE               COMMAND             CREATED             STATUS              PORTS               NAMES
+noel@noel-pc:~/Documentos/platzi/docker$ docker ps -a --filter="exited=0"
+CONTAINER ID        IMAGE               COMMAND                CREATED             STATUS                         PORTS               NAMES
+198d8b34a089        ubuntu              "ls -l"                2 minutes ago       Exited (0) 2 minutes ago                           noel
+91d8ed4ab8f8        ubuntu              "bash"                 14 minutes ago      Exited (0) 13 minutes ago                          elated_heyrovsky
+06c6c34864f4        ubuntu              "bash"                 17 minutes ago      Exited (0) 14 minutes ago                          stupefied_bell
+05f315674b99        ubuntu              "ps -efa"              20 minutes ago      Exited (0) 20 minutes ago                          adoring_aryabhata
+93cc5661df21        ubuntu              "echo 'Hola Platzi'"   23 minutes ago      Exited (0) 23 minutes ago                          upbeat_goodall
+51fe35f738e6        hello-world         "/hello"               About an hour ago   Exited (0) About an hour ago                       elegant_swirles
+5a37af86d1ae        hello-world         "/hello"               About an hour ago   Exited (0) About an hour ago                       naughty_benz
+noel@noel-pc:~/Documentos/platzi/docker$ 
+noel@noel-pc:~/Documentos/platzi/docker$ docker run --name noel ubuntu mkdir /carpeta/nnnnnn
+mkdir: cannot create directory '/carpeta/nnnnnn': No such file or directory
+noel@noel-pc:~/Documentos/platzi/docker$ docker ps -a
+CONTAINER ID        IMAGE               COMMAND                  CREATED             STATUS                         PORTS               NAMES
+67def5b2bea9        ubuntu              "mkdir /carpeta/nnnn…"   6 seconds ago       Exited (1) 4 seconds ago                           noel
+noel@noel-pc:~/Documentos/platzi/docker$ docker ps -a --filter="exited=1"
+CONTAINER ID        IMAGE               COMMAND                  CREATED              STATUS                          PORTS               NAMES
+67def5b2bea9        ubuntu              "mkdir /carpeta/nnnn…"   About a minute ago   Exited (1) About a minute ago                       noel
+noel@noel-pc:~/Documentos/platzi/docker$ docker run ubuntu /bin/ping -c 10 www.google.com
+noel@noel-pc:~/Documentos/platzi/docker$ docker run -d ubuntu ping -c 10 www.google.com
+ee35eee9cdb8fae33cd95366468a393daefe98c3506f279c9080e7347a3b5036
+noel@noel-pc:~/Documentos/platzi/docker$ docker start 1a5
+noel@noel-pc:~/Documentos/platzi/docker$ docker logs db0
+noel@noel-pc:~/Documentos/platzi/docker$ docker logs -f db0
+
+noel@noel-pc:~/Documentos/platzi/docker$ docker run -it ubuntu bash
+root@80a1a4b306f4:/# 
+
+ 2018-01-30 16:20:17 ⌚  noel-pc in ~
+○ → docker ps
+CONTAINER ID        IMAGE               COMMAND             CREATED              STATUS              PORTS                     NAMES
+80a1a4b306f4        ubuntu              "bash"              About a minute ago   Up About a minute                             unruffled_ritchie
+b2c620bab9f5        tomcat              "catalina.sh run"   5 minutes ago        Up 5 minutes        0.0.0.0:32768->8080/tcp   zen_stallman
+1e5d1c08f161        ubuntu              "bash"              About an hour ago    Up About an hour                              eager_dijkstra
+
+ 2018-01-30 16:20:29 ⌚  noel-pc in ~
+○ → docker exec -it 80a bash
+root@80a1a4b306f4:/# 
+root@80a1a4b306f4:/# touch holaplatzi
+root@80a1a4b306f4:/# exit
+exit
+
+ 2018-01-30 16:23:50 ⌚  noel-pc in ~
+○ → 
+
+root@80a1a4b306f4:/# ls
+bin  boot  dev  etc  holaplatzi  home  lib  lib64  media  mnt  opt  proc  root  run  sbin  srv  sys  tmp  usr  var
+root@80a1a4b306f4:/# exit
+exit
+noel@noel-pc:~/Documentos/platzi/docker$ 
+noel@noel-pc:~/Documentos/platzi/docker$ docker stop b2c
+b2c
+noel@noel-pc:~/Documentos/platzi/docker$ docker start -a b2c
+noel@noel-pc:~/Documentos/platzi/docker$ docker pause b2c
+noel@noel-pc:~/Documentos/platzi/docker$ docker unpause b2c
+noel@noel-pc:~/Documentos/platzi/docker$ docker inspect f23
+noel@noel-pc:~$ docker inspect f23 | grep MacAddress
+            "MacAddress": "02:42:ac:11:00:02",
+                    "MacAddress": "02:42:ac:11:00:02",
+noel@noel-pc:~$ 
+noel@noel-pc:~$ docker rm -f f23
+noel@noel-pc:~$ docker rm $(docker ps -a -q)
+
+
+
+
+
+noel@noel-pc:~/Documentos/platzi/docker$ docker run -ti ubuntu
+root@d6c51246901e:/# touch holaplatzi
+root@d6c51246901e:/# 
+
+ 2018-01-30 17:03:00 ⌚  noel-pc in ~
+○ → docker ps
+CONTAINER ID        IMAGE               COMMAND             CREATED              STATUS              PORTS               NAMES
+d6c51246901e        ubuntu              "/bin/bash"         About a minute ago   Up About a minute                       tender_swirles
+
+ 2018-01-30 17:03:24 ⌚  noel-pc in ~
+○ → docker commit d6c platzi
+sha256:8abbd0e0c5b61499dd646a4155dc5e77a7e162d0f75534b883d142c0823e1fa7
+
+ 2018-01-30 17:04:15 ⌚  noel-pc in ~
+○ → docker images
+REPOSITORY          TAG                 IMAGE ID            CREATED             SIZE
+platzi              latest              8abbd0e0c5b6        16 seconds ago      112MB
+ubuntu              16.04               0458a4468cbc        5 days ago          112MB
+ubuntu              latest              0458a4468cbc        5 days ago          112MB
+tomcat              latest              a92c139758db        7 days ago          558MB
+hello-world         latest              f2a91732366c        2 months ago        1.85kB
+
+ 2018-01-30 17:04:31 ⌚  noel-pc in ~
+○ → 
+root@d6c51246901e:/# exit
+exit
+noel@noel-pc:~/Documentos/platzi/docker$ docker run -ti platzi
+root@1d1fd9fee1ad:/# ls
+bin  boot  dev  etc  holaplatzi  home  lib  lib64  media  mnt  opt  proc  root  run  sbin  srv  sys  tmp  usr  var
+root@1d1fd9fee1ad:/# 
+
+
+
+
+
+
+
+
 
 
 
