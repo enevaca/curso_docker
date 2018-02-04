@@ -230,6 +230,431 @@ root@1d1fd9fee1ad:/#
 
 
 
+****************************************************************************************************************************
+ 2018-02-03 18:56:49 ⌚  noel-pc in ~/Documentos/platzi/docker
+± |master ✓| → mkdir test
+
+ 2018-02-03 18:57:22 ⌚  noel-pc in ~/Documentos/platzi/docker
+± |master U:1 ✗| → cd test
+
+noel@noel-pc:~/Documentos/platzi/docker/test$ vim Dockerfile 
+noel@noel-pc:~/Documentos/platzi/docker/test$ cat Dockerfile 
+FROM ubuntu
+RUN apt-get update
+RUN apt-get install -y curl
+RUN apt-get install -y vim
+
+noel@noel-pc:~/Documentos/platzi/docker/test$ docker build .
+.....
+update-alternatives: using /usr/bin/vim.basic to provide /usr/bin/editor (editor) in auto mode
+Processing triggers for libc-bin (2.23-0ubuntu10) ...
+Removing intermediate container bc61bb37a2c3
+ ---> 85bb8e7a2b72
+Successfully built 85bb8e7a2b72
+noel@noel-pc:~/Documentos/platzi/docker/test$ docker images
+REPOSITORY          TAG                 IMAGE ID            CREATED             SIZE
+<none>              <none>              85bb8e7a2b72        11 seconds ago      221MB
+platzi              latest              8abbd0e0c5b6        4 days ago          112MB
+ubuntu              16.04               0458a4468cbc        9 days ago          112MB
+ubuntu              latest              0458a4468cbc        9 days ago          112MB
+tomcat              latest              a92c139758db        11 days ago         558MB
+hello-world         latest              f2a91732366c        2 months ago        1.85kB
+
+noel@noel-pc:~/Documentos/platzi/docker/test$ docker run -ti 85bb bash
+root@300f24fc5da6:/# curl 
+curl: try 'curl --help' or 'curl --manual' for more information
+root@300f24fc5da6:/# vim
+root@300f24fc5da6:/# ^C
+root@300f24fc5da6:/# exit
+exit
+noel@noel-pc:~/Documentos/platzi/docker/test$ docker ps -a
+CONTAINER ID        IMAGE               COMMAND                  CREATED             STATUS                        PORTS               NAMES
+300f24fc5da6        85bb                "bash"                   59 seconds ago      Exited (130) 8 seconds ago                        musing_franklin
+noel@noel-pc:~/Documentos/platzi/docker/test$ docker build -t ubuntu_vim_curl .
+noel@noel-pc:~/Documentos/platzi/docker/test$ docker images
+REPOSITORY          TAG                 IMAGE ID            CREATED             SIZE
+ubuntu_vim_curl     latest              85bb8e7a2b72        6 minutes ago       221MB
+noel@noel-pc:~/Documentos/platzi/docker/test$ docker run -ti ubuntu_vim_curl bash
+root@a73dc8ac6cb0:/# curl
+curl: try 'curl --help' or 'curl --manual' for more information
+root@a73dc8ac6cb0:/# vim
+root@a73dc8ac6cb0:/# exit
+exit
+noel@noel-pc:~/Documentos/platzi/docker/test$
+noel@noel-pc:~/Documentos/platzi/docker/test$ vim Dockerfile 
+noel@noel-pc:~/Documentos/platzi/docker/test$ cat Dockerfile 
+FROM ubuntu
+RUN apt-get update && apt-get install -y vim && apt-get install -y curl
+
+noel@noel-pc:~/Documentos/platzi/docker/test$ docker build -t ubuntu_vim_curl .
+noel@noel-pc:~/Documentos/platzi/docker/test$ docker images
+noel@noel-pc:~/Documentos/platzi/docker/test$ docker history ubuntu_vim_curl
+IMAGE               CREATED             CREATED BY                                      SIZE                COMMENT
+0ca0fe896d27        50 seconds ago      /bin/sh -c apt-get update && apt-get install…   108MB               
+0458a4468cbc        9 days ago          /bin/sh -c #(nop)  CMD ["/bin/bash"]            0B                  
+<missing>           9 days ago          /bin/sh -c mkdir -p /run/systemd && echo 'do…   7B  
+noel@noel-pc:~/Documentos/platzi/docker/test$ docker history --no-trunc ubuntu_vim_curl
+noel@noel-pc:~/Documentos/platzi/docker/test$ vim Dockerfile 
+noel@noel-pc:~/Documentos/platzi/docker/test$ cat Dockerfile 
+FROM ubuntu
+RUN apt-get update 
+RUN apt-get install -y vim 
+RUN apt-get install -y curl
+noel@noel-pc:~/Documentos/platzi/docker/test$ docker build -t ubuntu_vim_curl .
+noel@noel-pc:~/Documentos/platzi/docker/test$ docker history ubuntu_vim_curl
+IMAGE               CREATED             CREATED BY                                      SIZE                COMMENT
+9bff57cee5cc        29 minutes ago      /bin/sh -c apt-get install -y curl              12.2MB              
+220a604d683d        30 minutes ago      /bin/sh -c apt-get install -y vim               57.5MB              
+6202e1963e12        About an hour ago   /bin/sh -c apt-get update                       39.6MB              
+0458a4468cbc        9 days ago          /bin/sh -c #(nop)  CMD ["/bin/bash"]            0B                  
+<missing>           9 days ago          /bin/sh -c mkdir -p /run/systemd && echo 'do…   7B                  
+<missing>           9 days ago          /bin/sh -c sed -i 's/^#\s*\(deb.*universe\)$…   2.76kB              
+<missing>           9 days ago          /bin/sh -c rm -rf /var/lib/apt/lists/*          0B                  
+<missing>           9 days ago          /bin/sh -c set -xe   && echo '#!/bin/sh' > /…   745B                
+<missing>           9 days ago          /bin/sh -c #(nop) ADD file:a3344b835ea6fdc56…   112MB               
+noel@noel-pc:~/Documentos/platzi/docker/test$ docker run -ti 220a bash
+root@f27f4adb3fc5:/# vim
+root@f27f4adb3fc5:/# curl
+bash: curl: command not found
+root@f27f4adb3fc5:/# exit
+exit
+noel@noel-pc:~/Documentos/platzi/docker/test$
+noel@noel-pc:~/Documentos/platzi/docker/test$ vim Dockerfile 
+noel@noel-pc:~/Documentos/platzi/docker/test$ cat Dockerfile 
+FROM ubuntu
+#RUN apt-get update 
+#RUN apt-get install -y vim 
+#RUN apt-get install -y curl
+RUN apt-get update && apt-get install -y iputils-ping
+CMD ping -c 10 www.google.com
+noel@noel-pc:~/Documentos/platzi/docker/test$ docker build -t ubuntu_ping .
+noel@noel-pc:~/Documentos/platzi/docker/test$ docker run ubuntu_ping
+noel@noel-pc:~/Documentos/platzi/docker/test$ docker run -ti ubuntu_ping bash
+root@47d6e2b20d7b:/# exit
+exit
+
+noel@noel-pc:~/Documentos/platzi/docker/test$ vim Dockerfile 
+noel@noel-pc:~/Documentos/platzi/docker/test$ cat Dockerfile 
+FROM ubuntu
+#RUN apt-get update 
+#RUN apt-get install -y vim 
+#RUN apt-get install -y curl
+RUN apt-get update && apt-get install -y iputils-ping
+#CMD ping -c 10 www.google.com
+CMD ["ping", "-c", "5", "www.google.com"]
+noel@noel-pc:~/Documentos/platzi/docker/test$ docker build -t ubuntu_ping .
+noel@noel-pc:~/Documentos/platzi/docker/test$ docker run ubuntu_ping
+
+
+
+noel@noel-pc:~/Documentos/platzi/docker/test$ vim Dockerfile 
+noel@noel-pc:~/Documentos/platzi/docker/test$ cat Dockerfile 
+FROM ubuntu
+#RUN apt-get update 
+#RUN apt-get install -y vim 
+#RUN apt-get install -y curl
+RUN apt-get update && apt-get install -y iputils-ping
+#CMD ping -c 10 www.google.com
+#CMD ["ping", "-c", "5", "www.google.com"]
+CMD echo $HOME
+
+noel@noel-pc:~/Documentos/platzi/docker/test$ docker build -t ubuntu_echo .
+noel@noel-pc:~/Documentos/platzi/docker/test$ docker run ubuntu_echo
+/root
+noel@noel-pc:~/Documentos/platzi/docker/test$ 
+
+noel@noel-pc:~/Documentos/platzi/docker/test$ vim Dockerfile 
+noel@noel-pc:~/Documentos/platzi/docker/test$ cat Dockerfile 
+FROM ubuntu
+#RUN apt-get update 
+#RUN apt-get install -y vim 
+#RUN apt-get install -y curl
+RUN apt-get update && apt-get install -y iputils-ping
+#CMD ping -c 10 www.google.com
+#CMD ["ping", "-c", "5", "www.google.com"]
+#CMD echo $HOME
+ENTRYPOINT ping www.google.com -c 2
+
+noel@noel-pc:~/Documentos/platzi/docker/test$ docker build -t ubuntu_echo .
+noel@noel-pc:~/Documentos/platzi/docker/test$ docker run ubuntu_echo
+
+
+
+noel@noel-pc:~/Documentos/platzi/docker/test$ vim Dockerfile 
+noel@noel-pc:~/Documentos/platzi/docker/test$ cat Dockerfile 
+FROM ubuntu
+#RUN apt-get update 
+#RUN apt-get install -y vim 
+#RUN apt-get install -y curl
+RUN apt-get update && apt-get install -y iputils-ping
+#CMD ping -c 10 www.google.com
+#CMD ["ping", "-c", "5", "www.google.com"]
+#CMD echo $HOME
+#ENTRYPOINT ping www.google.com -c 2
+ENTRYPOINT ["ping"]
+noel@noel-pc:~/Documentos/platzi/docker/test$ docker build -t ubuntu_ping .
+noel@noel-pc:~/Documentos/platzi/docker/test$ docker run ubuntu_ping
+Usage: ping [-aAbBdDfhLnOqrRUvV] [-c count] [-i interval] [-I interface]
+            [-m mark] [-M pmtudisc_option] [-l preload] [-p pattern] [-Q tos]
+            [-s packetsize] [-S sndbuf] [-t ttl] [-T timestamp_option]
+            [-w deadline] [-W timeout] [hop1 ...] destination
+noel@noel-pc:~/Documentos/platzi/docker/test$ docker run ubuntu_ping -c 2 www.google.com
+
+
+
+
+noel@noel-pc:~/Documentos/platzi/docker/test$ vim Dockerfile 
+noel@noel-pc:~/Documentos/platzi/docker/test$ cat Dockerfile 
+FROM ubuntu
+#RUN apt-get update 
+#RUN apt-get install -y vim 
+#RUN apt-get install -y curl
+RUN apt-get update && apt-get install -y iputils-ping
+#CMD ping -c 10 www.google.com
+#CMD ["ping", "-c", "5", "www.google.com"]
+#CMD echo $HOME
+#ENTRYPOINT ping www.google.com -c 2
+CMD ["-c", "2", "www.google.com"]
+ENTRYPOINT ["ping"]
+noel@noel-pc:~/Documentos/platzi/docker/test$ docker build -t ubuntu_ping .
+noel@noel-pc:~/Documentos/platzi/docker/test$ docker run ubuntu_ping
+PING www.google.com (172.217.29.196) 56(84) bytes of data.
+64 bytes from gru10s03-in-f4.1e100.net (172.217.29.196): icmp_seq=1 ttl=49 time=87.7 ms
+64 bytes from gru10s03-in-f4.1e100.net (172.217.29.196): icmp_seq=2 ttl=49 time=87.2 ms
+
+--- www.google.com ping statistics ---
+2 packets transmitted, 2 received, 0% packet loss, time 1000ms
+rtt min/avg/max/mdev = 87.267/87.487/87.708/0.368 ms
+noel@noel-pc:~/Documentos/platzi/docker/test$ docker run ubuntu_ping -c 1 yahoo.com
+PING yahoo.com (98.138.252.38) 56(84) bytes of data.
+64 bytes from media-router-fp1.prod.media.vip.ne1.yahoo.com (98.138.252.38): icmp_seq=1 ttl=47 time=170 ms
+
+--- yahoo.com ping statistics ---
+1 packets transmitted, 1 received, 0% packet loss, time 0ms
+rtt min/avg/max/mdev = 170.509/170.509/170.509/0.000 ms
+noel@noel-pc:~/Documentos/platzi/docker/test$ 
+
+
+
+Copiando archivos
+noel@noel-pc:~/Documentos/platzi/docker/test$ vim Dockerfile 
+noel@noel-pc:~/Documentos/platzi/docker/test$ cat Dockerfile 
+FROM ubuntu
+#RUN apt-get update 
+#RUN apt-get install -y vim 
+#RUN apt-get install -y curl
+RUN apt-get update && apt-get install -y iputils-ping
+#CMD ping -c 10 www.google.com
+#CMD ["ping", "-c", "5", "www.google.com"]
+#CMD echo $HOME
+#ENTRYPOINT ping www.google.com -c 2
+#CMD ["-c", "2", "www.google.com"]
+#ENTRYPOINT ["ping"]
+CMD cat /tmp/platzi
+noel@noel-pc:~/Documentos/platzi/docker/test$ echo "Hola PLatzi docker" > test.txt
+noel@noel-pc:~/Documentos/platzi/docker/test$ vim Dockerfile 
+noel@noel-pc:~/Documentos/platzi/docker/test$ cat Dockerfile 
+FROM ubuntu
+COPY test.txt /tmp/platzi
+CMD cat /tmp/platzi
+noel@noel-pc:~/Documentos/platzi/docker/test$ docker build -t ubuntu_hola .
+noel@noel-pc:~/Documentos/platzi/docker/test$ docker history ubuntu_hola
+noel@noel-pc:~/Documentos/platzi/docker/test$ docker run ubuntu_hola
+Hola PLatzi docker
+noel@noel-pc:~/Documentos/platzi/docker/test$ 
+
+
+Ejemplo con Python
+
+noel@noel-pc:~/Documentos/platzi/docker/test$ cd ..
+noel@noel-pc:~/Documentos/platzi/docker$ git clone https://github.com/enevaca/platzidocker.git
+noel@noel-pc:~/Documentos/platzi/docker/platzidocker$ cd app/
+noel@noel-pc:~/Documentos/platzi/docker/platzidocker/app$ ls
+app.py	docker-compose-full.yml  docker-compose.yml  Dockerfile  README.md  requirements.txt
+
+
+noel@noel-pc:~/Documentos/platzi/docker/platzidocker$ cd app/
+noel@noel-pc:~/Documentos/platzi/docker/platzidocker/app$ ls
+app.py	docker-compose-full.yml  docker-compose.yml  Dockerfile  README.md  requirements.txt
+noel@noel-pc:~/Documentos/platzi/docker/platzidocker/app$ cat requirements.txt 
+flask
+redis
+noel@noel-pc:~/Documentos/platzi/docker/platzidocker/app$ vim Dockerfile 
+noel@noel-pc:~/Documentos/platzi/docker/platzidocker/app$ cp Dockerfile Dockerfile_backup
+noel@noel-pc:~/Documentos/platzi/docker/platzidocker/app$ vim Dockerfile
+noel@noel-pc:~/Documentos/platzi/docker/platzidocker/app$ cat Dockerfile
+FROM python:2.7
+COPY app.py requirements.txt /app/
+RUN pip install -r /app/requirements.txt
+CMD python /app/app.py
+noel@noel-pc:~/Documentos/platzi/docker/platzidocker/app$ docker build -t app . 
+noel@noel-pc:~/Documentos/platzi/docker/platzidocker/app$ docker images
+REPOSITORY          TAG                 IMAGE ID            CREATED             SIZE
+app                 latest              68ac201a8689        14 seconds ago      687MB
+....
+noel@noel-pc:~/Documentos/platzi/docker/platzidocker/app$ docker run app
+ * Running on http://0.0.0.0:5000/ (Press CTRL+C to quit)
+ * Restarting with stat
+ * Debugger is active!
+ * Debugger PIN: 247-943-560
+
+
+en otra terminal
+ 2018-02-03 21:59:36 ⌚  noel-pc in ~/Documentos/platzi/docker
+± |master U:1 ?:2 ✗| → su - noel
+Contraseña: 
+noel@noel-pc:~$ docker ps
+CONTAINER ID        IMAGE               COMMAND                  CREATED             STATUS              PORTS               NAMES
+2e66c51970ab        app                 "/bin/sh -c 'python …"   2 minutes ago       Up 2 minutes                            wizardly_blackwell
+noel@noel-pc:~$ docker kill 2e66c51970ab
+2e66c51970ab
+noel@noel-pc:~$ 
+
+noel@noel-pc:~/Documentos/platzi/docker/platzidocker/app$ vim Dockerfile
+noel@noel-pc:~/Documentos/platzi/docker/platzidocker/app$ cat Dockerfile
+FROM python:2.7
+COPY app.py requirements.txt /app/
+RUN pip install -r /app/requirements.txt
+CMD python /app/app.py
+EXPOSE 5000
+noel@noel-pc:~/Documentos/platzi/docker/platzidocker/app$ docker build -t app . 
+noel@noel-pc:~/Documentos/platzi/docker/platzidocker/app$ docker run -d app
+72acc64d98409e35931ad3df3cd5fa070d9b504e0afbfdd06655a1a2280bacfa
+noel@noel-pc:~/Documentos/platzi/docker/platzidocker/app$ docker ps
+CONTAINER ID        IMAGE               COMMAND                  CREATED             STATUS              PORTS               NAMES
+72acc64d9840        app                 "/bin/sh -c 'python …"   25 seconds ago      Up 23 seconds       5000/tcp            awesome_meitner
+
+Hasta aqui todavia no da en el navegado localhost:500
+noel@noel-pc:~/Documentos/platzi/docker/platzidocker/app$ docker kill 72acc64d9840
+72acc64d9840
+noel@noel-pc:~/Documentos/platzi/docker/platzidocker/app$ docker run -d -P app
+cb672e918a9cb5eba2f22f46aa129e44d42acb765b0765d2595652100cb49a19
+noel@noel-pc:~/Documentos/platzi/docker/platzidocker/app$ docker ps
+CONTAINER ID        IMAGE               COMMAND                  CREATED             STATUS              PORTS                     NAMES
+cb672e918a9c        app                 "/bin/sh -c 'python …"   13 seconds ago      Up 12 seconds       0.0.0.0:32768->5000/tcp   serene_beaver
+noel@noel-pc:~/Documentos/platzi/docker/platzidocker/app$ ahora si correo en el navegado en el puerto 32768 pero con errores de el host redis
+noel@noel-pc:~/Documentos/platzi/docker/platzidocker/app$ docker exec -ti cb672e918a9c bash
+root@cb672e918a9c:/# ping redis
+ping: unknown host
+root@cb672e918a9c:/# 
+root@cb672e918a9c:/# exit
+exit
+noel@noel-pc:~/Documentos/platzi/docker/platzidocker/app$ vim Dockerfile
+noel@noel-pc:~/Documentos/platzi/docker/platzidocker/app$ cat Dockerfile
+FROM python:2.7
+WORKDIR /app
+COPY app.py requirements.txt ./
+RUN pip install -r requirements.txt
+CMD python app.py
+EXPOSE 5000
+noel@noel-pc:~/Documentos/platzi/docker/platzidocker/app$ docker build -t app . 
+noel@noel-pc:~/Documentos/platzi/docker/platzidocker/app$ docker run -d -P app
+333d951ff4b84b340709f820dd9d2de69f960e1776ee74e6df341ca6be56cf2b
+noel@noel-pc:~/Documentos/platzi/docker/platzidocker/app$ docker ps
+CONTAINER ID        IMAGE               COMMAND                  CREATED             STATUS              PORTS                     NAMES
+333d951ff4b8        app                 "/bin/sh -c 'python …"   15 seconds ago      Up 13 seconds       0.0.0.0:32769->5000/tcp   gifted_volhard
+cb672e918a9c        c090a7138c43        "/bin/sh -c 'python …"   9 minutes ago       Up 9 minutes        0.0.0.0:32768->5000/tcp   serene_beaver
+noel@noel-pc:~/Documentos/platzi/docker/platzidocker/app$ 
+
+
+instruccion add
+noel@noel-pc:~/Documentos/platzi/docker/platzidocker/app$ cd ../../test/
+noel@noel-pc:~/Documentos/platzi/docker/test$ vi Dockerfile 
+noel@noel-pc:~/Documentos/platzi/docker/test$ cat Dockerfile 
+FROM ubuntu
+RUN apt-get update && apt-get install -y jp2a
+ADD http://cdn.meme.am/instances/66627195.jpg /tmp/img.jpg
+ENV TERM xterm-256color
+CMD jp2a --size=60x40 /tmp/img.jpg
+noel@noel-pc:~/Documentos/platzi/docker/test$ docker build -t add .
+noel@noel-pc:~/Documentos/platzi/docker/test$ docker run add
+
+
+Otros comandos
+noel@noel-pc:~/Documentos/platzi/docker/test$ cp Dockerfile Dockerfile_ADD
+noel@noel-pc:~/Documentos/platzi/docker/test$ vi Dockerfile 
+noel@noel-pc:~/Documentos/platzi/docker/test$ cat Dockerfile
+FROM ubuntu
+MAINTAINER noel.vm.2501@gmail.com
+ENV hola mundo
+LABEL key value
+noel@noel-pc:~/Documentos/platzi/docker/test$ docker build -t test .
+noel@noel-pc:~/Documentos/platzi/docker/test$ docker inspect test
+noel@noel-pc:~/Documentos/platzi/docker/test$ docker run -ti test bash
+root@bca2e9aec2cb:/# env
+root@bca2e9aec2cb:/# exit
+exit
+noel@noel-pc:~/Documentos/platzi/docker/test$ 
+
+
+
+subiendo imagen a docker
+noel@noel-pc:~/Documentos/platzi/docker/test$ docker images
+noel@noel-pc:~/Documentos/platzi/docker/test$ docker tag add noelvm/neodocker
+noel@noel-pc:~/Documentos/platzi/docker/test$ docker images
+noel@noel-pc:~/Documentos/platzi/docker/test$ docker login
+Login with your Docker ID to push and pull images from Docker Hub. If you don't have a Docker ID, head over to https://hub.docker.com to create one.
+Username: noelvm
+Password: 
+Login Succeeded
+noel@noel-pc:~/Documentos/platzi/docker/test$ docker push noelvm/neodocker
+The push refers to repository [docker.io/noelvm/neodocker]
+f35208ccb6ee: Pushed 
+8e476594f909: Pushed 
+6f4ce6b88849: Pushed 
+92914665e7f6: Pushed 
+c98ef191df4b: Pushed 
+9c7183e0ea88: Pushed 
+ff986b10a018: Pushed 
+latest: digest: sha256:52af012130c4e1b40279bddc8564eb202f3fee768d4e894be7c6a39aa71ca2b7 size: 1778
+noel@noel-pc:~/Documentos/platzi/docker/test$ docker run noelvm/neodocker
+https://hub.docker.com/
+
+
+
+
+Eliminar imagenes
+noel@noel-pc:~/Documentos/platzi/docker/test$ docker images
+noel@noel-pc:~/Documentos/platzi/docker/test$ docker ps -a
+noel@noel-pc:~/Documentos/platzi/docker/test$ cd ~
+noel@noel-pc:~$ ls -la .bashrc
+-rw-r--r-- 1 noel noel 3370 ene 27 12:45 .bashrc
+noel@noel-pc:~$ alias dockerremove='docker rm $(docker ps -qa)'
+noel@noel-pc:~$ alias dockerkill='docker kill $(docker ps -q)'
+noel@noel-pc:~$ . .bashrc
+noel@noel-pc:~$ alias
+noel@noel-pc:~/Documentos/platzi/docker/test$ dockerkill 
+333d951ff4b8
+cb672e918a9c
+noel@noel-pc:~/Documentos/platzi/docker/test$ dockerremove 
+333d951ff4b8
+cb672e918a9c 
+noel@noel-pc:~/Documentos/platzi/docker/test$ docker images
+noel@noel-pc:~/Documentos/platzi/docker/test$ docker rmi test
+Untagged: test:latest
+Deleted: sha256:d4717944b992c865a9b90b9f6a1c865b26df83283df9a32dd030ce508337b04b
+Deleted: sha256:56037ad79790b2735eb217674cf07b926bb748d6a31d8b71aeda9cfb63f140b0
+Deleted: sha256:4df3a65eebf862a1897c66509d36a7904d262be89bfa1efd3a71531eb44d9825
+noel@noel-pc:~/Documentos/platzi/docker/test$ docker images
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
