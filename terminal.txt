@@ -639,6 +639,107 @@ noel@noel-pc:~/Documentos/platzi/docker/test$ docker images
 
 
 
+*********************************************************************************************************
+Volumenes
+1......
+noel@noel-pc:~$ docker volume ls
+DRIVER              VOLUME NAME
+noel@noel-pc:~$ docker volume rm $(docker volume ls -q)
+noel@noel-pc:~$ docker volume create --name prueba
+prueba
+noel@noel-pc:~$ docker volume ls
+DRIVER              VOLUME NAME
+local               prueba
+noel@noel-pc:~$ docker run -ti -v prueba:/prueba ubuntu bash
+root@42bc0a0cc1e4:/# cd /prueba/
+root@42bc0a0cc1e4:/prueba# touch prueba.txt
+root@42bc0a0cc1e4:/prueba# exit
+exit
+noel@noel-pc:~/Documentos/platzi/docker$ docker run -ti -v prueba:/prueba ubuntu bash
+root@42e663478b3f:/# ls /prueba/
+prueba.txt
+root@42e663478b3f:/# 
+
+2...
+ 2018-02-04 21:19:07 ⌚  noel-pc in ~/Documentos/platzi/docker
+± |master U:2 ✗| → su - noel
+Contraseña: 
+noel@noel-pc:~$ cd Documentos/platzi/docker/
+noel@noel-pc:~/Documentos/platzi/docker$ docker volume ls
+DRIVER              VOLUME NAME
+local               prueba
+noel@noel-pc:~/Documentos/platzi/docker$ docker volume inspect prueba
+[
+    {
+        "CreatedAt": "2018-02-04T21:16:51-04:00",
+        "Driver": "local",
+        "Labels": {},
+        "Mountpoint": "/var/lib/docker/volumes/prueba/_data",
+        "Name": "prueba",
+        "Options": {},
+        "Scope": "local"
+    }
+]
+noel@noel-pc:~/Documentos/platzi/docker$ sudo su -
+[sudo] password for noel: 
+root@noel-pc:~# cd /var/lib/docker/volumes/prueba/_data/
+root@noel-pc:/var/lib/docker/volumes/prueba/_data# ls
+prueba.txt
+root@noel-pc:/var/lib/docker/volumes/prueba/_data# touch platzi.txt
+
+1...
+root@42e663478b3f:/# ls /prueba/
+platzi.txt  prueba.txt
+root@42e663478b3f:/#
+
+2.....
+root@noel-pc:/var/lib/docker/volumes/prueba/_data# exit
+logout
+noel@noel-pc:~/Documentos/platzi/docker$ docker run -ti -v prueba:/platzi ubuntu bash
+root@daffff047dd7:/# cd /platzi/
+root@daffff047dd7:/platzi# ls
+platzi.txt  prueba.txt
+root@daffff047dd7:/platzi# 
+
+1....
+noel@noel-pc:~/Documentos/platzi/docker$ dockerremove 
+daffff047dd7
+42e663478b3f
+42bc0a0cc1e4
+noel@noel-pc:~/Documentos/platzi/docker$ docker volume rm prueba 
+prueba
+noel@noel-pc:~/Documentos/platzi/docker$ docker volume ls
+noel@noel-pc:~/Documentos/platzi/docker$ cd test
+noel@noel-pc:~/Documentos/platzi/docker/test$ vi Dockerfile
+noel@noel-pc:~/Documentos/platzi/docker/test$ cat Dockerfile
+FROM ubuntu
+MAINTAINER noel.vm.2501@gmail.com
+ENV hola mundo
+LABEL key value
+VOLUME /prueba
+noel@noel-pc:~/Documentos/platzi/docker/test$ docker build -t volumen .
+noel@noel-pc:~/Documentos/platzi/docker/test$ docker run -ti volumen bash
+root@1f1e184b8870:/# cd prueba/
+root@1f1e184b8870:/prueba# touch prueba.txt 
+root@1f1e184b8870:/prueba# exit
+exit
+noel@noel-pc:~/Documentos/platzi/docker/test$ docker volume ls
+DRIVER              VOLUME NAME
+noel@noel-pc:~/Documentos/platzi/docker/test$ touch pruebaplatzi
+noel@noel-pc:~/Documentos/platzi/docker/test$ docker run -ti -v /home/noel/Documentos/platzi/docker/test:/prueba ubuntu bash
+root@1eaf18d53cba:/# cd /prueba/
+root@1eaf18d53cba:/prueba# ls
+Dockerfile  Dockerfile_ADD  pruebaplatzi  test.txt
+root@1eaf18d53cba:/prueba# 
+
+
+
+
+
+
+
+
+
 
 
 
