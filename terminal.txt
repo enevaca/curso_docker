@@ -733,6 +733,126 @@ Dockerfile  Dockerfile_ADD  pruebaplatzi  test.txt
 root@1eaf18d53cba:/prueba# 
 
 
+*************************************************************************************
+Seguridad
+noel@noel-pc:~/Documentos/platzi/docker$ mkdir docker-ca
+noel@noel-pc:~/Documentos/platzi/docker$ cd docker-ca/
+noel@noel-pc:~/Documentos/platzi/docker/docker-ca$ openssl genrsa -aes256 -out ca-key.pem 2048
+Generating RSA private key, 2048 bit long modulus
+............................................................................................+++
+....................+++
+e is 65537 (0x10001)
+Enter pass phrase for ca-key.pem: capass
+Verifying - Enter pass phrase for ca-key.pem: capass
+noel@noel-pc:~/Documentos/platzi/docker/docker-ca$ ls
+ca-key.pem
+noel@noel-pc:~/Documentos/platzi/docker/docker-ca$ openssl req -new -x509 -days 365 -key ca-key.pem -sha256 -out ca.pem
+Enter pass phrase for ca-key.pem:
+You are about to be asked to enter information that will be incorporated
+into your certificate request.
+What you are about to enter is what is called a Distinguished Name or a DN.
+There are quite a few fields but you can leave some blank
+For some fields there will be a default value,
+If you enter '.', the field will be left blank.
+-----
+Country Name (2 letter code) [AU]:
+State or Province Name (full name) [Some-State]:
+Locality Name (eg, city) []:
+Organization Name (eg, company) [Internet Widgits Pty Ltd]:
+Organizational Unit Name (eg, section) []:
+Common Name (e.g. server FQDN or YOUR name) []:
+Email Address []:
+noel@noel-pc:~/Documentos/platzi/docker/docker-ca$ openssl genrsa -out server-key.pem 2048
+Generating RSA private key, 2048 bit long modulus
+................................................................................+++
+.........+++
+e is 65537 (0x10001)
+noel@noel-pc:~/Documentos/platzi/docker/docker-ca$ ls
+ca.pem	ca-key.pem  server-key.pem
+paso 3...
+noel@noel-pc:~/Documentos/platzi/docker/docker-ca$ openssl req -subj "/CN=localhost" -new -key server-key.pem -out server.csr
+noel@noel-pc:~/Documentos/platzi/docker/docker-ca$ ls
+ca.pem	ca-key.pem  server.csr  server-key.pem
+noel@noel-pc:~/Documentos/platzi/docker/docker-ca$ 
+paso 4...
+noel@noel-pc:~/Documentos/platzi/docker/docker-ca$ echo "subjectAltName = IP:127.0.0.1" > extfile.cnf
+noel@noel-pc:~/Documentos/platzi/docker/docker-ca$ ls
+ca.pem	ca-key.pem  extfile.cnf  server.csr  server-key.pem
+noel@noel-pc:~/Documentos/platzi/docker/docker-ca$ openssl x509 -req -days 365 -in server.csr -CA ca.pem -CAkey ca-key.pem -CAcreateserial -out server-cert.pem -extfile extfile.cnf 
+Signature ok
+subject=/CN=localhost
+Getting CA Private Key
+Enter pass phrase for ca-key.pem:
+noel@noel-pc:~/Documentos/platzi/docker/docker-ca$ 
+noel@noel-pc:~/Documentos/platzi/docker/docker-ca$ ls
+ca.pem	ca-key.pem  ca.srl  extfile.cnf  server-cert.pem  server.csr  server-key.pem
+noel@noel-pc:~/Documentos/platzi/docker/docker-ca$ 
+paso 5....
+noel@noel-pc:~/Documentos/platzi/docker/docker-ca$ openssl genrsa -out client-key.pem 2048
+Generating RSA private key, 2048 bit long modulus
+..................................................................................................+++
+..............................................................+++
+e is 65537 (0x10001)
+noel@noel-pc:~/Documentos/platzi/docker/docker-ca$ ls
+ca.pem	ca-key.pem  ca.srl  client-key.pem  extfile.cnf  server-cert.pem  server.csr  server-key.pem
+noel@noel-pc:~/Documentos/platzi/docker/docker-ca$ openssl req -subj '/CN=client' -new -key client-key.pem -out client.csr
+noel@noel-pc:~/Documentos/platzi/docker/docker-ca$ ls
+ca.pem	ca-key.pem  ca.srl  client.csr  client-key.pem  extfile.cnf  server-cert.pem  server.csr  server-key.pem
+noel@noel-pc:~/Documentos/platzi/docker/docker-ca$ 
+paso 6...
+noel@noel-pc:~/Documentos/platzi/docker/docker-ca$ echo "extendedKeyUsage = clientAuth" > extfile.cnf
+noel@noel-pc:~/Documentos/platzi/docker/docker-ca$ openssl x509 -req -days 365 -in client.csr -CA ca.pem -CAkey ca-key.pem -CAcreateserial -out client-cert.pem -extfile extfile.cnf 
+Signature ok
+subject=/CN=client
+Getting CA Private Key
+Enter pass phrase for ca-key.pem:
+noel@noel-pc:~/Documentos/platzi/docker/docker-ca$ 
+
+docker tls ....
+1....iniciar el demonio 
+noel@noel-pc:~/Documentos/platzi/docker/docker-ca$ ps -fea | grep docker
+root      1975     1  0 15:36 ?        00:00:54 /usr/bin/dockerd -H fd://
+root      2224  1975  0 15:36 ?        00:00:41 docker-containerd --config /var/run/docker/containerd/containerd.toml
+noel     14992  3823  0 21:12 ?        00:00:20 gedit /home/noel/Documentos/platzi/docker/terminal.txt
+noel     18850 15006  0 22:43 pts/0    00:00:00 grep docker
+noel@noel-pc:~/Documentos/platzi/docker/docker-ca$ sudo kill $(pidof docker)
+//noel@noel-pc:~/Documentos/platzi/docker/docker-ca$ sudo docker daemon -H tcp://0.0.0.0:2375 --tlsverify --tlscacert=./ca.pem --tlscert=./server-cert.pem --tlskey=./server-key.pem &
+noel@noel-pc:~/Documentos/platzi/docker/docker-ca$ export DOCKER_HOST="tcp://localhost:2375"
+noel@noel-pc:~/Documentos/platzi/docker/docker-ca$ DOCKER_OPTS="-H tcp://0.0.0.0:2375 --tlsverify --tlscacert=./ca.pem --tlscert=./server-cert.pem --tlskey=./server-key.pem" &
+[1] 20046
+noel@noel-pc:~/Documentos/platzi/docker/docker-ca$ docker ps
+Cannot connect to the Docker daemon at tcp://localhost:2375. Is the docker daemon running?
+[1]+  Hecho                   DOCKER_OPTS="-H tcp://0.0.0.0:2375 --tlsverify --tlscacert=./ca.pem --tlscert=./server-cert.pem --tlskey=./server-key.pem"
+noel@noel-pc:~/Documentos/platzi/docker/docker-ca$ 
+
+2...reiniciar el sevicio
+noel@noel-pc:~/Documentos/platzi/docker/docker-ca$ sudo service docker restart
+
+3... utilizar las credenciales
+noel@noel-pc:~/Documentos/platzi/docker/docker-ca$ docker --tlsverify --tlscacert=./ca.pem --tlscert=./client-cert.pem --tlskey=./client-key.pem ps
+Cannot connect to the Docker daemon at tcp://localhost:2375. Is the docker daemon running?
+noel@noel-pc:~/Documentos/platzi/docker/docker-ca$ 
+
+
+tips
+noel@noel-pc:~/Documentos/platzi/docker/docker-ca$ cp client-cert.pem client-key.pem ca.pem ~/.docker
+noel@noel-pc:~/Documentos/platzi/docker/docker-ca$ mv client-cert.pem cert.pem
+noel@noel-pc:~/Documentos/platzi/docker/docker-ca$ mv client-key.pem key.pem
+noel@noel-pc:~/Documentos/platzi/docker/docker-ca$ cd ~/.docker
+noel@noel-pc:~/.docker$ docker ps
+Cannot connect to the Docker daemon at tcp://localhost:2375. Is the docker daemon running?
+noel@noel-pc:~/.docker$ export DOCKER_TLS_VERIFY=1
+noel@noel-pc:~/.docker$ docker ps
+
+
+
+
+
+
+
+
+
+
 
 
 
