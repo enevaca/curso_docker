@@ -847,14 +847,139 @@ noel@noel-pc:~/.docker$ docker ps
 
 
 
+************************************************************************************************************************************
+Redes
+
+noel@noel-pc:~/Documentos/platzi/docker/platzidocker/app$ docker run -d -P app
+8429c819ec72ac4e2f75d2450548c04220754e27f5f06b119c9529be59c428e9
+noel@noel-pc:~/Documentos/platzi/docker/platzidocker/app$ docker ps -a
+CONTAINER ID        IMAGE               COMMAND                  CREATED             STATUS              PORTS                     NAMES
+8429c819ec72        app                 "/bin/sh -c 'python …"   7 seconds ago       Up 5 seconds        0.0.0.0:32768->5000/tcp   stoic_golick
+noel@noel-pc:~/Documentos/platzi/docker/platzidocker/app$ 
+
+noel@noel-pc:~/Documentos/platzi/docker/platzidocker/app$ ip a
+1: lo: <LOOPBACK,UP,LOWER_UP> mtu 65536 qdisc noqueue state UNKNOWN group default qlen 1000
+    link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00
+    inet 127.0.0.1/8 scope host lo
+       valid_lft forever preferred_lft forever
+    inet6 ::1/128 scope host 
+       valid_lft forever preferred_lft forever
+2: eno1: <NO-CARRIER,BROADCAST,MULTICAST,UP> mtu 1500 qdisc pfifo_fast state DOWN group default qlen 1000
+    link/ether 9c:b6:54:be:93:42 brd ff:ff:ff:ff:ff:ff
+3: wlo1: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc mq state UP group default qlen 1000
+    link/ether 68:17:29:dc:90:ab brd ff:ff:ff:ff:ff:ff
+    inet 192.168.1.9/24 brd 192.168.1.255 scope global dynamic wlo1
+       valid_lft 57095sec preferred_lft 57095sec
+    inet6 fe80::23cb:3be0:d7a4:3f9d/64 scope link 
+       valid_lft forever preferred_lft forever
+4: docker0: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc noqueue state UP group default 
+    link/ether 02:42:02:c3:15:50 brd ff:ff:ff:ff:ff:ff
+    inet 172.17.0.1/16 brd 172.17.255.255 scope global docker0
+       valid_lft forever preferred_lft forever
+    inet6 fe80::42:2ff:fec3:1550/64 scope link 
+       valid_lft forever preferred_lft forever
+18: vethe106d64@if17: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc noqueue master docker0 state UP group default 
+    link/ether 3e:09:7a:ae:06:80 brd ff:ff:ff:ff:ff:ff link-netnsid 0
+    inet6 fe80::3c09:7aff:feae:680/64 scope link 
+       valid_lft forever preferred_lft forever
+noel@noel-pc:~/Documentos/platzi/docker/platzidocker/app$ 
+
+noel@noel-pc:~/Documentos/platzi/docker/platzidocker/app$ alias dockerkill='docker kill $(docker ps -q)'
+noel@noel-pc:~/Documentos/platzi/docker/platzidocker/app$ dockerkill
+noel@noel-pc:~/Documentos/platzi/docker/platzidocker/app$ ip a
+noel@noel-pc:~/Documentos/platzi/docker/platzidocker/app$ docker network ls
+NETWORK ID          NAME                DRIVER              SCOPE
+af6d858e68e5        bridge              bridge              local
+7fd143fc77ed        host                host                local
+1270488b8f3e        none                null                local
+noel@noel-pc:~/Documentos/platzi/docker/platzidocker/app$
+noel@noel-pc:~/Documentos/platzi/docker/platzidocker/app$ docker run -ti --net=host ubuntu bash
+root@noel-pc:/# ip a
+
+noel@noel-pc:~/Documentos/platzi/docker/platzidocker/app$ docker network create mi_red
+bc7b48455c3a05818e35ce2d04238bef8db6fbaed24eb2ad6cc94d55ccd4657c
+noel@noel-pc:~/Documentos/platzi/docker/platzidocker/app$ docker network ls
+NETWORK ID          NAME                DRIVER              SCOPE
+af6d858e68e5        bridge              bridge              local
+7fd143fc77ed        host                host                local
+bc7b48455c3a        mi_red              bridge              local
+1270488b8f3e        none                null                local
+noel@noel-pc:~/Documentos/platzi/docker/platzidocker/app$ 
+noel@noel-pc:~/Documentos/platzi/docker/platzidocker/app$ docker run -t ubuntu bash
+root@65470a694b49:/# apt-get update
+root@26500db42a5e:/# apt-get install net-tools
+root@26500db42a5e:/# ifconfig
+noel@noel-pc:~/Documentos/platzi/docker/platzidocker/app$ docker run -ti --name redis ubuntu bash
+root@e80bffdafb82:/# ifconfig
+
+2....
+noel@noel-pc:~/Documentos/platzi/docker$ docker run -ti --link redis ubuntu bash
+root@b99c4eb75578:/# ping redis
+root@b99c4eb75578:/# cat /etc/hosts 
+127.0.0.1	localhost
+::1	localhost ip6-localhost ip6-loopback
+fe00::0	ip6-localnet
+ff00::0	ip6-mcastprefix
+ff02::1	ip6-allnodes
+ff02::2	ip6-allrouters
+172.17.0.5	redis e80bffdafb82
+172.17.0.3	b99c4eb75578
+root@b99c4eb75578:/# 
+noel@noel-pc:~/Documentos/platzi/docker/platzidocker/app$ dockerkill 
+c7d92a2d2f99
+65470a694b49
+noel@noel-pc:~/Documentos/platzi/docker/platzidocker/app$ dockerremove 
+c7d92a2d2f99
+65470a694b49
+noel@noel-pc:~/Documentos/platzi/docker/platzidocker/app$ docker run -ti --name redis --net=mi_red ubuntu bash
+root@c2f282292595:/# cat /etc/resolv.conf 
+nameserver 127.0.0.11
+options ndots:0
+root@c2f282292595:/# 
 
 
+noel@noel-pc:~/Documentos/platzi/docker/platzidocker/app$ docker run -ti --name container1 ubuntu bash
+root@60a4e021a66e:/# 
+
+noel@noel-pc:~/Documentos/platzi/docker$ docker run -ti --name container3 --net=mi_red ubuntu bash
+root@41d8f25e0d91:/# 
+
+noel@noel-pc:~$ docker run -ti --name container2 --net=mi_red ubuntu bash
+root@14ff9fbe84f9:/# 
+
+noel@noel-pc:~$ docker network connect bridge container2
+noel@noel-pc:~$ docker network ls
+NETWORK ID          NAME                DRIVER              SCOPE
+af6d858e68e5        bridge              bridge              local
+7fd143fc77ed        host                host                local
+bc7b48455c3a        mi_red              bridge              local
+1270488b8f3e        none                null                local
+noel@noel-pc:~$ docker network inspect bridge
 
 
+noel@noel-pc:~/Documentos/platzi/docker/platzidocker/app$ docker pull redis
+noel@noel-pc:~/Documentos/platzi/docker/platzidocker/app$ docker images
+noel@noel-pc:~/Documentos/platzi/docker/platzidocker/app$ docker run -d --name redis redis
+b628ab9f43b86eaf3a89d98402121136e16c53f94712e2785c0d1ce5812e5719
+noel@noel-pc:~/Documentos/platzi/docker/platzidocker/app$ docker ps
+CONTAINER ID        IMAGE               COMMAND                  CREATED             STATUS              PORTS               NAMES
+b628ab9f43b8        redis               "docker-entrypoint.s…"   21 seconds ago      Up 20 seconds       6379/tcp            redis
+noel@noel-pc:~/Documentos/platzi/docker/platzidocker/app$
+noel@noel-pc:~/Documentos/platzi/docker/platzidocker/app$ docker run -d -P --link redis app
+76e041bd8158e09eecf35a60cd2633962966bed7a03833966fb0a2d7bf06a2b7
+noel@noel-pc:~/Documentos/platzi/docker/platzidocker/app$ docker ps
+CONTAINER ID        IMAGE               COMMAND                  CREATED             STATUS              PORTS                     NAMES
+76e041bd8158        app                 "/bin/sh -c 'python …"   5 seconds ago       Up 3 seconds        0.0.0.0:32770->5000/tcp   tender_fermi
+b628ab9f43b8        redis               "docker-entrypoint.s…"   2 minutes ago       Up 2 minutes        6379/tcp                  redis
+noel@noel-pc:~/Documentos/platzi/docker/platzidocker/app$ 
 
+en el navegador http://localhost:32770/
 
+noel@noel-pc:~/Documentos/platzi/docker/platzidocker/app$ docker run -d -p 8080:5000 --link redis app
+2b8b816f411c84d9e5a1ac755369e90931369aac178658f74abba4398beb7ce2
+noel@noel-pc:~/Documentos/platzi/docker/platzidocker/app$ 
 
-
+en el navegador http://localhost:8080 ya es un puerto predefinido
 
 
 
