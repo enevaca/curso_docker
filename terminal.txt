@@ -1103,6 +1103,242 @@ noel@noel-pc:~/.docker/machine/machines/dockervirtual$
 
 
 
+*************************************************************************************************************
+Docker Compose
+1----
+https://github.com/docker/compose/releases
+noel@noel-pc:~/.docker/machine/machines/dockervirtual$ sudo curl -L https://github.com/docker/compose/releases/download/1.19.0/docker-compose-`uname -s`-`uname -m` -o /usr/local/bin/docker-compose
+noel@noel-pc:~/.docker/machine/machines/dockervirtual$ sudo chmod +x /usr/local/bin/docker-compose
+noel@noel-pc:~/.docker/machine/machines/dockervirtual$ docker-compose version
+sh: 0: getcwd() failed: No such file or directory
+docker-compose version 1.19.0, build 9e633ef
+docker-py version: 2.7.0
+CPython version: 2.7.13
+OpenSSL version: OpenSSL 1.0.1t  3 May 2016
+noel@noel-pc:~/.docker/machine/machines/dockervirtual$
+
+noel@noel-pc:~/Documentos/platzi/docker/platzidocker/app$ vim docker-compose.yml
+noel@noel-pc:~/Documentos/platzi/docker/platzidocker/app$ cat docker-compose.yml
+web:
+    build: .
+    links:
+        - redis
+    expose:
+        - "5000"
+redis:
+    image: redis
+
+noel@noel-pc:~/Documentos/platzi/docker/platzidocker/app$ docker-compose up
+
+
+2---
+noel@noel-pc:~/Documentos/platzi/docker/platzidocker$ docker ps
+CONTAINER ID        IMAGE               COMMAND                  CREATED              STATUS              PORTS               NAMES
+161c468950da        app_web             "/bin/sh -c 'python …"   About a minute ago   Up About a minute   5000/tcp            app_web_1
+0140113548ac        redis               "docker-entrypoint.s…"   About a minute ago   Up About a minute   6379/tcp            app_redis_1
+noel@noel-pc:~/Documentos/platzi/docker/platzidocker$ 
+
+1---
+noel@noel-pc:~/Documentos/platzi/docker/platzidocker/app$ cat docker-compose.yml
+web:
+    build: .
+    links:
+        - redis
+    ports:
+        - "80:5000"
+redis:
+    image: redis
+
+noel@noel-pc:~/Documentos/platzi/docker/platzidocker/app$ docker-compose up -d
+Starting app_redis_1 ... done
+Recreating app_web_1 ... done
+noel@noel-pc:~/Documentos/platzi/docker/platzidocker/app$ docker ps
+CONTAINER ID        IMAGE               COMMAND                  CREATED             STATUS              PORTS                  NAMES
+74e95eeaee7e        app_web             "/bin/sh -c 'python …"   12 seconds ago      Up 10 seconds       0.0.0.0:80->5000/tcp   app_web_1
+0140113548ac        redis               "docker-entrypoint.s…"   4 minutes ago       Up 11 seconds       6379/tcp               app_redis_1
+noel@noel-pc:~/Documentos/platzi/docker/platzidocker/app$ 
+En el navegado http://localhost/
+
+noel@noel-pc:~/Documentos/platzi/docker/platzidocker/app$ vim Dockerfile
+noel@noel-pc:~/Documentos/platzi/docker/platzidocker/app$ docker-compose build
+noel@noel-pc:~/Documentos/platzi/docker/platzidocker/app$ docker-compose up -d
+app_redis_1 is up-to-date
+Recreating app_web_1 ... done
+noel@noel-pc:~/Documentos/platzi/docker/platzidocker/app$
+Entrar a http://localhost/ se van a ver los cambios en app.py
+
+noel@noel-pc:~/Documentos/platzi/docker/platzidocker/app$ docker-compose build
+noel@noel-pc:~/Documentos/platzi/docker/platzidocker/app$ docker-compose up -d
+
+
+noel@noel-pc:~/Documentos/platzi/docker/platzidocker/app$ docker-compose logs
+noel@noel-pc:~/Documentos/platzi/docker/platzidocker/app$ docker-compose logs web
+
+noel@noel-pc:~/Documentos/platzi/docker/platzidocker/app$ docker-compose stop
+Stopping app_web_1   ... done
+Stopping app_redis_1 ... done
+noel@noel-pc:~/Documentos/platzi/docker/platzidocker/app$ docker ps
+CONTAINER ID        IMAGE               COMMAND             CREATED             STATUS              PORTS               NAMES
+noel@noel-pc:~/Documentos/platzi/docker/platzidocker/app$ docker ps -a
+CONTAINER ID        IMAGE               COMMAND                  CREATED             STATUS                       PORTS               NAMES
+60366d917d12        app_web             "/bin/sh -c 'python …"   8 minutes ago       Exited (137) 8 seconds ago                       app_web_1
+0140113548ac        redis               "docker-entrypoint.s…"   27 minutes ago      Exited (0) 7 seconds ago                         app_redis_1
+noel@noel-pc:~/Documentos/platzi/docker/platzidocker/app$ docker-compose rm
+Going to remove app_web_1, app_redis_1
+Are you sure? [yN] y
+Removing app_web_1   ... done
+Removing app_redis_1 ... done
+noel@noel-pc:~/Documentos/platzi/docker/platzidocker/app$ docker ps -a
+CONTAINER ID        IMAGE               COMMAND             CREATED             STATUS              PORTS               NAMES
+noel@noel-pc:~/Documentos/platzi/docker/platzidocker/app$ docker-compose help
+
+
+Extras
+noel@noel-pc:~/Documentos/platzi/docker/platzidocker/app$ vim docker-compose.yml
+noel@noel-pc:~/Documentos/platzi/docker/platzidocker/app$ cat docker-compose.yml
+web:
+    build: .
+    volumes:
+        - .:/platzi
+    links:
+        - redis
+    ports:
+        - "80:5000"
+redis:
+    image: redis
+
+noel@noel-pc:~/Documentos/platzi/docker/platzidocker/app$ docker-compose up -d
+app_redis_1 is up-to-date
+Recreating app_web_1 ... done
+noel@noel-pc:~/Documentos/platzi/docker/platzidocker/app$ docker ps
+CONTAINER ID        IMAGE               COMMAND                  CREATED             STATUS              PORTS                  NAMES
+a854811f7826        app_web             "/bin/sh -c 'python …"   33 seconds ago      Up 32 seconds       0.0.0.0:80->5000/tcp   app_web_1
+a9e220a6b37d        redis               "docker-entrypoint.s…"   4 minutes ago       Up 4 minutes        6379/tcp               app_redis_1
+noel@noel-pc:~/Documentos/platzi/docker/platzidocker/app$ docker exec -ti app_web_1 bash
+root@a854811f7826:/app# cd /platzi/
+root@a854811f7826:/platzi# ls
+Dockerfile	   README.md  docker-compose-full.yml  docker-compose.yml.bak
+Dockerfile_backup  app.py     docker-compose.yml       requirements.txt
+root@a854811f7826:/platzi# exit
+exit
+noel@noel-pc:~/Documentos/platzi/docker/platzidocker/app$ docker-compose down 
+Stopping app_web_1   ... done
+Stopping app_redis_1 ... done
+Removing app_web_1   ... done
+Removing app_redis_1 ... done
+noel@noel-pc:~/Documentos/platzi/docker/platzidocker/app$ 
+
+
+
+
+Escalar servicios
+noel@noel-pc:~/Documentos/platzi/docker/platzidocker/app$ docker-compose scale --help
+noel@noel-pc:~/Documentos/platzi/docker/platzidocker/app$ docker-compose scale web=4
+WARNING: The scale command is deprecated. Use the up command with the --scale flag instead.
+WARNING: The "web" service specifies a port on the host. If multiple containers for this service are created on a single host, the port will clash.
+Starting app_web_1 ... done
+Creating app_web_2 ... error
+Creating app_web_3 ... error
+Creating app_web_4 ... error
+
+ERROR: for app_web_4  Cannot start service web: driver failed programming external connectivity on endpoint app_web_4 (8475b946dd8b6cc321ff95cff2b581905c49ec4966be0a680c67e9ea20c66c1b): Bind for 0.0.0.0:80 failed: port is already allocated
+
+ERROR: for app_web_2  Cannot start service web: driver failed programming external connectivity on endpoint app_web_2 (e5e01fe8f7c73cf9ed48a8679be82e22ffc760d1910913661d55f2cc82ec0689): Bind for 0.0.0.0:80 failed: port is already allocated
+
+ERROR: for app_web_3  Cannot start service web: driver failed programming external connectivity on endpoint app_web_3 (f5d700a4af80da56244abefd431f5868cda2f886eea8e7db84e9cfe3f5225416): Bind for 0.0.0.0:80 failed: port is already allocated
+ERROR: Cannot start service web: driver failed programming external connectivity on endpoint app_web_4 (8475b946dd8b6cc321ff95cff2b581905c49ec4966be0a680c67e9ea20c66c1b): Bind for 0.0.0.0:80 failed: port is already allocated
+noel@noel-pc:~/Documentos/platzi/docker/platzidocker/app$ 
+noel@noel-pc:~/Documentos/platzi/docker/platzidocker/app$ vim docker-compose.yml
+noel@noel-pc:~/Documentos/platzi/docker/platzidocker/app$ cat docker-compose.yml
+web:
+    build: .
+    volumes:
+        - .:/platzi
+    links:
+        - redis
+    expose:
+        - "5000"
+redis:
+    image: redis
+
+noel@noel-pc:~/Documentos/platzi/docker/platzidocker/app$ docker-compose up -d
+noel@noel-pc:~/Documentos/platzi/docker/platzidocker/app$ docker-compose scale web=4
+WARNING: The scale command is deprecated. Use the up command with the --scale flag instead.
+Starting app_web_1 ... done
+Creating app_web_2 ... done
+Creating app_web_3 ... done
+Creating app_web_4 ... done
+noel@noel-pc:~/Documentos/platzi/docker/platzidocker/app$ docker-compose ps
+   Name                  Command               State    Ports  
+---------------------------------------------------------------
+app_redis_1   docker-entrypoint.sh redis ...   Up      6379/tcp
+app_web_1     /bin/sh -c python app.py         Up      5000/tcp
+app_web_2     /bin/sh -c python app.py         Up      5000/tcp
+app_web_3     /bin/sh -c python app.py         Up      5000/tcp
+app_web_4     /bin/sh -c python app.py         Up      5000/tcp
+noel@noel-pc:~/Documentos/platzi/docker/platzidocker/app$ 
+
+
+
+
+Balance de carga (load balancer (lb))
+noel@noel-pc:~/Documentos/platzi/docker/platzidocker/app$ vim docker-compose.yml
+noel@noel-pc:~/Documentos/platzi/docker/platzidocker/app$ cat docker-compose.yml
+web:
+    build: .
+    volumes:
+        - .:/platzi
+    links:
+        - redis
+    expose:
+        - "5000"
+redis:
+    image: redis
+lb:
+    image: tutum/haproxy
+    links: 
+        - web
+    ports:
+        - "80:80"
+    environment:
+        - BACKEND_PORT=500
+        - BALANCE=roundrobin
+noel@noel-pc:~/Documentos/platzi/docker/platzidocker/app$ docker-compose ps
+   Name                  Command               State    Ports  
+---------------------------------------------------------------
+app_redis_1   docker-entrypoint.sh redis ...   Up      6379/tcp
+app_web_1     /bin/sh -c python app.py         Up      5000/tcp
+app_web_2     /bin/sh -c python app.py         Up      5000/tcp
+app_web_3     /bin/sh -c python app.py         Up      5000/tcp
+app_web_4     /bin/sh -c python app.py         Up      5000/tcp
+noel@noel-pc:~/Documentos/platzi/docker/platzidocker/app$ docker-compose down
+noel@noel-pc:~/Documentos/platzi/docker/platzidocker/app$ docker-compose up -d
+noel@noel-pc:~/Documentos/platzi/docker/platzidocker/app$ docker-compose ps
+   Name                  Command               State                         Ports                      
+--------------------------------------------------------------------------------------------------------
+app_lb_1      python /haproxy/main.py          Up      1936/tcp, 443/tcp, 80/tcp, 0.0.0.0:8080->8080/tcp
+app_redis_1   docker-entrypoint.sh redis ...   Up      6379/tcp                                         
+app_web_1     /bin/sh -c python app.py         Up      5000/tcp 
+noel@noel-pc:~/Documentos/platzi/docker/platzidocker/app$ docker-compose scale web=10
+WARNING: The scale command is deprecated. Use the up command with the --scale flag instead.
+Starting app_web_1 ... done
+Creating app_web_2  ... done
+Creating app_web_3  ... done
+Creating app_web_4  ... done
+Creating app_web_5  ... done
+Creating app_web_6  ... done
+Creating app_web_7  ... done
+Creating app_web_8  ... done
+Creating app_web_9  ... done
+Creating app_web_10 ... done
+noel@noel-pc:~/Documentos/platzi/docker/platzidocker/app$ docker-compose up -d --force-recreate --no-deps lb
+Recreating app_lb_1 ... done
+noel@noel-pc:~/Documentos/platzi/docker/platzidocker/app$ 
+Ver en el navegador localhost
+
+
+
+
 
 
 
