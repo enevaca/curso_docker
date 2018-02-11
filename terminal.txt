@@ -1410,6 +1410,93 @@ noel@noel-pc:~/Documentos/platzi/docker/platzidocker/app$ dockerremove
 
 
 
+******************************************************************************************
+Imagenes
+noel@noel-pc:~/Documentos/platzi/docker$ mkdir imagenes
+noel@noel-pc:~/Documentos/platzi/docker$ cd imagenes/
+noel@noel-pc:~/Documentos/platzi/docker/imagenes$ vim Dockerfile
+noel@noel-pc:~/Documentos/platzi/docker/imagenes$ cat Dockerfile 
+FROM ubuntu
+RUN mkdir /tmp/foo
+RUN fallocate -l 1G /tmp/foo/bar
+RUN rm -rf /tmp/foo
+noel@noel-pc:~/Documentos/platzi/docker/imagenes$ docker build -t test .
+Sending build context to Docker daemon  2.048kB
+Step 1/4 : FROM ubuntu
+ ---> 0458a4468cbc
+Step 2/4 : RUN mkdir /tmp/foo
+ ---> Running in 44842f8b792a
+Removing intermediate container 44842f8b792a
+ ---> 46363135d66f
+Step 3/4 : RUN fallocate -l 1G /tmp/foo/bar
+ ---> Running in 0faa4c316628
+Removing intermediate container 0faa4c316628
+ ---> 79e41fb735ed
+Step 4/4 : RUN rm -rf /tmp/foo
+ ---> Running in c5a5cf0a87b2
+Removing intermediate container c5a5cf0a87b2
+ ---> ebc5725f420c
+Successfully built ebc5725f420c
+Successfully tagged test:latest
+
+noel@noel-pc:~/Documentos/platzi/docker/imagenes$ docker images
+REPOSITORY          TAG                 IMAGE ID            CREATED             SIZE
+test                latest              ebc5725f420c        29 seconds ago      1.19GB
+
+noel@noel-pc:~/Documentos/platzi/docker/imagenes$ vi Dockerfile 
+noel@noel-pc:~/Documentos/platzi/docker/imagenes$ cat Dockerfile
+FROM ubuntu
+RUN mkdir /tmp/foo && fallocate -l 1G /tmp/foo/bar && rm -rf /tmp/foo
+noel@noel-pc:~/Documentos/platzi/docker/imagenes$ docker build -t test .
+Sending build context to Docker daemon  2.048kB
+Step 1/2 : FROM ubuntu
+ ---> 0458a4468cbc
+Step 2/2 : RUN mkdir /tmp/foo && fallocate -l 1G /tmp/foo/bar && rm -rf /tmp/foo
+ ---> Running in 78aa942b6514
+Removing intermediate container 78aa942b6514
+ ---> c08743003b0e
+Successfully built c08743003b0e
+Successfully tagged test:latest
+noel@noel-pc:~/Documentos/platzi/docker/imagenes$ 
+
+
+
+
+noel@noel-pc:~/Documentos/platzi/docker/imagenes$ vi Dockerfile 
+noel@noel-pc:~/Documentos/platzi/docker/imagenes$ cat Dockerfile 
+FROM ubuntu
+RUN mkdir /tmp/foo 
+RUN fallocate -l 1G /tmp/foo/bar 
+RUN rm -rf /tmp/foo
+noel@noel-pc:~/Documentos/platzi/docker/imagenes$ docker build -t test .
+Sending build context to Docker daemon  2.048kB
+Step 1/4 : FROM ubuntu
+ ---> 0458a4468cbc
+Step 2/4 : RUN mkdir /tmp/foo
+ ---> Using cache
+ ---> 46363135d66f
+Step 3/4 : RUN fallocate -l 1G /tmp/foo/bar
+ ---> Using cache
+ ---> 79e41fb735ed
+Step 4/4 : RUN rm -rf /tmp/foo
+ ---> Using cache
+ ---> ebc5725f420c
+Successfully built ebc5725f420c
+Successfully tagged test:latest
+noel@noel-pc:~/Documentos/platzi/docker/imagenes$ docker images
+REPOSITORY          TAG                 IMAGE ID            CREATED             SIZE
+test                latest              ebc5725f420c        6 minutes ago       1.19GB
+
+noel@noel-pc:~/Documentos/platzi/docker/imagenes$ docker ps
+CONTAINER ID        IMAGE               COMMAND             CREATED             STATUS              PORTS               NAMES
+9bd8bf36637f        test                "bash"              5 minutes ago       Up 5 minutes                            mystifying_borg
+noel@noel-pc:~/Documentos/platzi/docker/imagenes$ docker export 9bd8bf36637f | docker import - test2
+sha256:01e15dc88c9f007f942be4918d626d1cc887331e49cf4833b4da46bbd97d1c4f
+noel@noel-pc:~/Documentos/platzi/docker/imagenes$ docker images
+REPOSITORY          TAG                 IMAGE ID            CREATED             SIZE
+test2               latest              01e15dc88c9f        5 seconds ago       85.8MB
+test                latest              ebc5725f420c        16 minutes ago      1.19GB
+
 
 
 
