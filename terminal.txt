@@ -1499,6 +1499,66 @@ test                latest              ebc5725f420c        16 minutes ago      
 
 
 
+************************************************************************************************************************
+Utilizando Docker en mi proceso de integración continua
+
+noel@noel-pc:~/Documentos/platzi/docker$ mkdir platzifiles
+noel@noel-pc:~/Documentos/platzi/docker$ cd platzifiles/
+noel@noel-pc:~/Documentos/platzi/docker/platzifiles$ vim Dockerfile
+noel@noel-pc:~/Documentos/platzi/docker/platzifiles$ cat Dockerfile 
+FROM jeanblanchard/busybox-java:/
+MAINTAINER Noel Vaca, noel.vm.2501@gmail.com
+RUN wget -O http://dynamodb-local.s3-website-us-west-2.amazonas.com/dynamodb_local_latest | gunzip | tar x
+ENTRYPOINT ["/opt/jdk/bin/java", "-Djava.library.path=./DynamoDBLocal_lib", "-jar", "DynamoDBLocal.jar"]
+CMD ["-help"]
+
+noel@noel-pc:~/Documentos/platzi/docker/platzifiles$ 
+
+
+
+*************************************************************************************************************************
+Haciendo backups de archivos con Docker
+
+1.......
+noel@noel-pc:~/Documentos/platzi/docker/platzifiles$ docker run --name webdata -v /srv/www busybox
+Unable to find image 'busybox:latest' locally
+latest: Pulling from library/busybox
+57310166fe88: Pull complete 
+Digest: sha256:1669a6aa7350e1cdd28f972ddad5aceba2912f589f19a090ac75b7083da748db
+Status: Downloaded newer image for busybox:latest
+noel@noel-pc:~/Documentos/platzi/docker/platzifiles$ docker ps -a
+CONTAINER ID        IMAGE               COMMAND             CREATED             STATUS                      PORTS               NAMES
+1c1a344456d4        busybox             "sh"                21 seconds ago      Exited (0) 20 seconds ago                       webdata
+9bd8bf36637f        test                "bash"              37 minutes ago      Up 37 minutes                                   mystifying_borg
+e27b50446bf3        test                "bash"              About an hour ago   Exited (0) 45 minutes ago                       nifty_austin
+noel@noel-pc:~/Documentos/platzi/docker/platzifiles$ docker run --volumes-from webdata -it --name webserver ubuntu
+root@1b038643dc99:/# cd /srv/www/
+root@1b038643dc99:/srv/www# ls
+root@1b038643dc99:/srv/www# echo "Hola platzi" >> access.log
+root@1b038643dc99:/srv/www# echo "Hola platzi" >> access.log
+root@1b038643dc99:/srv/www# echo "Hola platzi" >> access.log
+root@1b038643dc99:/srv/www# echo "Hola platzi" >> access.log
+root@1b038643dc99:/srv/www# cat access.log 
+Hola platzi
+Hola platzi
+Hola platzi
+Hola platzi
+root@1b038643dc99:/srv/www#    
+
+
+
+2................
+noel@noel-pc:~/Documentos/platzi/docker/platzifiles$ docker run --volumes-from webdata -v `pwd`:/back ubuntu tar cvf /back/access.tar /srv/www
+tar: Removing leading `/' from member names
+/srv/www/
+/srv/www/access.log
+noel@noel-pc:~/Documentos/platzi/docker/platzifiles$ ls
+access.tar  Dockerfile
+noel@noel-pc:~/Documentos/platzi/docker/platzifiles$ tar -tvf access.tar 
+drwxr-xr-x root/root         0 2018-02-10 22:14 srv/www/
+-rw-r--r-- root/root        48 2018-02-10 22:14 srv/www/access.log
+noel@noel-pc:~/Documentos/platzi/docker/platzifiles$ 
+
 
 
 
