@@ -1342,8 +1342,71 @@ Ver en el navegador localhost
 
 
 
+************************************************************************************************************************************
+Multi-host y Docker Swarm
 
-
+noel@noel-pc:~/Documentos/platzi/docker/platzidocker/app$ docker-machine create -d virtualbox consul
+noel@noel-pc:~/Documentos/platzi/docker/platzidocker/app$ docker-machine ls
+NAME     ACTIVE   DRIVER       STATE     URL                         SWARM   DOCKER        ERRORS
+consul   -        virtualbox   Running   tcp://192.168.99.100:2376           v18.02.0-ce   
+noel@noel-pc:~/Documentos/platzi/docker/platzidocker/app$ docker $(docker-machine config consul) run -d -p "8500:8500" -h "consul" progrium/consul -server -bootstrap
+noel@noel-pc:~/Documentos/platzi/docker/platzidocker/app$ docker $(docker-machine config consul) ps
+CONTAINER ID        IMAGE               COMMAND                  CREATED             STATUS              PORTS                                                                            NAMES
+b8ec99ea6bbe        progrium/consul     "/bin/start -server …"   2 minutes ago       Up 2 minutes        53/tcp, 53/udp, 8300-8302/tcp, 8400/tcp, 8301-8302/udp, 0.0.0.0:8500->8500/tcp   serene_pike
+noel@noel-pc:~/Documentos/platzi/docker/platzidocker/app$ 
+noel@noel-pc:~/Documentos/platzi/docker/platzidocker/app$ docker-machine create -d virtualbox --virtualbox-disk-size 50000 --swarm --swarm-master --swarm-discovery="consul://$(docker-machine ip consul):8500" --engine-opt="cluster-store=consul://$(docker-machine ip consul):8500" --engine-opt="cluster-advertise=eth1:0" demo0
+noel@noel-pc:~/Documentos/platzi/docker/platzidocker/app$ docker-machine create -d virtualbox --virtualbox-disk-size 50000 --swarm --swarm-discovery="consul://$(docker-machine ip consul):8500" --engine-opt="cluster-store=consul://$(docker-machine ip consul):8500" --engine-opt="cluster-advertise=eth1:0" demo1
+noel@noel-pc:~/Documentos/platzi/docker/platzidocker/app$ eval $(docker-machine env --swarm demo0)
+noel@noel-pc:~/Documentos/platzi/docker/platzidocker/app$ docker info
+Containers: 3
+ Running: 3
+ Paused: 0
+ Stopped: 0
+Images: 2
+Server Version: swarm/1.2.8
+Role: primary
+Strategy: spread
+Filters: health, port, containerslots, dependency, affinity, constraint, whitelist
+Nodes: 2
+ demo0: 192.168.99.101:2376
+  └ ID: SLXG:OXEW:QDPS:ZTVP:5CRR:RWBU:6HKF:UM3W:VINY:XZ5O:P7V6:7KZQ|192.168.99.101:2376
+  └ Status: Healthy
+  └ Containers: 2 (2 Running, 0 Paused, 0 Stopped)
+  └ Reserved CPUs: 0 / 1
+  └ Reserved Memory: 0 B / 1.021 GiB
+  └ Labels: kernelversion=4.4.115-boot2docker, operatingsystem=Boot2Docker 18.02.0-ce (TCL 8.2.1); HEAD : 99245f4 - Thu Feb  8 17:43:39 UTC 2018, ostype=linux, provider=virtualbox, storagedriver=aufs
+  └ UpdatedAt: 2018-02-11T00:12:27Z
+  └ ServerVersion: 18.02.0-ce
+ demo1: 192.168.99.102:2376
+  └ ID: MCHQ:23BP:JV2V:DCSD:KIL6:2CZU:SLUP:I6A5:GQWU:QJ3B:CDPO:DM76|192.168.99.102:2376
+  └ Status: Healthy
+  └ Containers: 1 (1 Running, 0 Paused, 0 Stopped)
+  └ Reserved CPUs: 0 / 1
+  └ Reserved Memory: 0 B / 1.021 GiB
+  └ Labels: kernelversion=4.4.115-boot2docker, operatingsystem=Boot2Docker 18.02.0-ce (TCL 8.2.1); HEAD : 99245f4 - Thu Feb  8 17:43:39 UTC 2018, ostype=linux, provider=virtualbox, storagedriver=aufs
+  └ UpdatedAt: 2018-02-11T00:12:41Z
+  └ ServerVersion: 18.02.0-ce
+....................
+noel@noel-pc:~/Documentos/platzi/docker/platzidocker/app$ docker ps -a
+CONTAINER ID        IMAGE               COMMAND                  CREATED             STATUS              PORTS                                     NAMES
+5b2a70f575c1        swarm:latest        "/swarm join --adver…"   5 minutes ago       Up 5 minutes        2375/tcp                                  demo1/swarm-agent
+473278eadb8a        swarm:latest        "/swarm join --adver…"   8 minutes ago       Up 8 minutes        2375/tcp                                  demo0/swarm-agent
+da4caa934a1d        swarm:latest        "/swarm manage --tls…"   8 minutes ago       Up 8 minutes        2375/tcp, 192.168.99.101:3376->3376/tcp   demo0/swarm-agent-master
+noel@noel-pc:~/Documentos/platzi/docker/platzidocker/app$ docker network ls
+NETWORK ID          NAME                DRIVER              SCOPE
+b3ebb58f121e        demo0/bridge        bridge              local
+3cb64a025290        demo0/host          host                local
+992f1c732930        demo0/none          null                local
+f951bfc53702        demo1/bridge        bridge              local
+b19e5639c58a        demo1/host          host                local
+fffbf669c276        demo1/none          null                local
+noel@noel-pc:~/Documentos/platzi/docker/platzidocker/app$ docker network create test
+feb5a5f49d2b1dcdb40fbfc8cea01acfba255c23c59de1dca5eb02d1fa7fc8bf
+noel@noel-pc:~/Documentos/platzi/docker/platzidocker/app$ docker run -d nginx
+noel@noel-pc:~/Documentos/platzi/docker/platzidocker/app$ docker run -d nginx --net=test nginx
+noel@noel-pc:~/Documentos/platzi/docker/platzidocker/app$ docker exec -ti 4b01b6bde8fb bash
+noel@noel-pc:~/Documentos/platzi/docker/platzidocker/app$ dockerkill
+noel@noel-pc:~/Documentos/platzi/docker/platzidocker/app$ dockerremove 
 
 
 
